@@ -13,22 +13,22 @@
 npm run build
 ```
 
-Ожидаемые файлы для версии 1.8.0:
+Ожидаемые файлы для версии 1.9.0:
 
-- `release/Codex-Account-Manager-Setup-1.8.0.exe`
-- `release/Codex-Account-Manager-1.8.0.exe`
+- `release/Codex-Account-Manager-Setup-1.9.0.exe`
+- `release/Codex-Account-Manager-1.9.0.exe`
 - `release/latest.yml`
-- `release/Codex-Account-Manager-Setup-1.8.0.exe.blockmap`
-- `release/SHA256SUMS-1.8.0.txt`
+- `release/Codex-Account-Manager-Setup-1.9.0.exe.blockmap`
+- `release/SHA256SUMS-1.9.0.txt`
 
 ## Контрольные суммы
 
 ```powershell
 Get-ChildItem release -File |
-  Where-Object { $_.Name -match '1\.8\.0|latest\.yml|blockmap' } |
+  Where-Object { $_.Name -match '1\.9\.0|latest\.yml|blockmap' } |
   Get-FileHash -Algorithm SHA256 |
   ForEach-Object { "$($_.Hash.ToLower())  $([IO.Path]::GetFileName($_.Path))" } |
-  Set-Content release/SHA256SUMS-1.8.0.txt -Encoding ascii
+  Set-Content release/SHA256SUMS-1.9.0.txt -Encoding ascii
 ```
 
 ## Smoke-проверка

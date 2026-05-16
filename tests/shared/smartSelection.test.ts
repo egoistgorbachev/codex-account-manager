@@ -69,4 +69,30 @@ describe("selectSmartAccount", () => {
 
     expect(recommendation?.accountId).toBe("calm");
   });
+
+  it("ignores archived and stale accounts before auto switching", () => {
+    const recommendation = selectSmartAccount([
+      account({ id: "archived", label: "archived", archived: true, fiveHourUsedPercent: 1, lastRefreshAt: 100 }),
+      account({ id: "stale", label: "stale", fiveHourUsedPercent: 2, lastRefreshAt: 1 }),
+      account({ id: "fresh", label: "fresh", fiveHourUsedPercent: 35, lastRefreshAt: 100 })
+    ], null, { now: 100, staleAfterSeconds: 15 });
+
+    expect(recommendation?.accountId).toBe("fresh");
+  });
+
+  it("does not prefer a workspace-bound account when its snapshot is stale", () => {
+    const binding: WorkspaceBinding = {
+      workspacePath: "C:/work",
+      accountId: "workspace",
+      accountLabel: "workspace",
+      accountEmail: "workspace@example.com"
+    };
+
+    const recommendation = selectSmartAccount([
+      account({ id: "workspace", label: "workspace", fiveHourUsedPercent: 1, lastRefreshAt: 1 }),
+      account({ id: "fresh", label: "fresh", fiveHourUsedPercent: 40, lastRefreshAt: 100 })
+    ], binding, { now: 100, staleAfterSeconds: 15 });
+
+    expect(recommendation).toMatchObject({ accountId: "fresh", workspaceMatched: false });
+  });
 });

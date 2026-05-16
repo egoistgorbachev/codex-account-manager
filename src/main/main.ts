@@ -484,7 +484,7 @@ async function refreshAllRateLimits(reason: "auto" | "manual") {
     mainWindow?.webContents.send("accounts:updated");
     log(`${reason === "auto" ? "Auto-refresh" : "Manual refresh"} completed`);
     const settings = settingsService?.get();
-    const recommendation = selectSmartAccount(refreshed, manager.getWorkspaceBinding());
+    const recommendation = selectSmartAccount(refreshed, manager.getWorkspaceBinding(), { staleAfterSeconds: 15 * 60 });
     const target = recommendation ? refreshed.find((account) => account.id === recommendation.accountId) : null;
     if (settings?.smartSwitchMode === "auto" && target && !target.isActive) {
       log(`Smart auto-switch selected ${target.email}: ${recommendation?.reason ?? "no reason"}`);

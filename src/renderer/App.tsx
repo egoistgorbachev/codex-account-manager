@@ -7,6 +7,7 @@ import {
   ArrowUpRight,
   Bot,
   CheckCircle2,
+  Command,
   Cpu,
   Database,
   ExternalLink,
@@ -46,6 +47,8 @@ import type {
   UpdateCheckResult,
   WorkspaceBinding
 } from "../shared/types";
+import type { CommandPaletteCommand } from "../shared/commandPalette";
+import { buildCommandPalette, filterCommandPalette } from "../shared/commandPalette";
 import { selectSmartAccount } from "../shared/smartSelection";
 import { appVersion, releaseNotes } from "../shared/releaseNotes";
 import logoUrl from "./assets/logo.png";
@@ -776,6 +779,105 @@ function ConfirmDialog({
   );
 }
 
+function CommandPalette({
+  open,
+  query,
+  commands,
+  busy,
+  onQuery,
+  onClose,
+  onRun
+}: {
+  open: boolean;
+  query: string;
+  commands: CommandPaletteCommand[];
+  busy: string | null;
+  onQuery: (value: string) => void;
+  onClose: () => void;
+  onRun: (command: CommandPaletteCommand) => void;
+}) {
+  if (!open) return null;
+  const visible = filterCommandPalette(commands, query).slice(0, 18);
+  const groups = Array.from(new Set(visible.map((command) => command.group)));
+
+  return (
+    <div className="modal-backdrop command-backdrop" role="dialog" aria-modal="true" aria-label="Командная палитра">
+      <div className="command-palette">
+        <div className="command-search">
+          <Command />
+          <input
+            autoFocus
+            value={query}
+            onChange={(event) => onQuery(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") onClose();
+            }}
+            placeholder="Найти команду, аккаунт или действие"
+            aria-label="Поиск команды"
+          />
+          <kbd>Esc</kbd>
+        </div>
+        <div className="command-list">
+          {visible.length === 0 ? <div className="empty compact-empty">Команд не найдено.</div> : null}
+          {groups.map((group) => (
+            <section key={group} className="command-group">
+              <span>{group}</span>
+              {visible.filter((command) => command.group === group).map((command) => (
+                <button
+                  key={command.id}
+                  className="command-row"
+                  disabled={busy !== null || command.disabled}
+                  onClick={() => onRun(command)}
+                >
+                  <strong>{command.title}</strong>
+                  <small>{command.subtitle}</small>
+                </button>
+              ))}
+            </section>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function OperationsTimeline({
+  history,
+  onOpenHealth
+}: {
+  history: SwitchHistoryItem[];
+  onOpenHealth: () => void;
+}) {
+  return (
+    <section className="page-panel ops-timeline" aria-label="Лента операций">
+      <div className="page-header">
+        <span>Аудит</span>
+        <h2>Последние действия</h2>
+      </div>
+      <div className="timeline-list">
+        {history.length ? history.slice(0, 4).map((event) => (
+          <article key={event.id} className={`timeline-item ${event.status}`}>
+            <div>
+              <strong>{event.accountLabel ?? event.accountEmail ?? event.accountId}</strong>
+              <span>{event.status === "completed" ? "переключение выполнено" : event.status === "failed" ? "переключение с ошибкой" : event.status}</span>
+            </div>
+            <time>{formatTime(event.startedAt)}</time>
+          </article>
+        )) : (
+          <div className="empty compact-empty">
+            <strong>История пока пустая</strong>
+            <span>После первого переключения здесь появится audit timeline.</span>
+          </div>
+        )}
+      </div>
+      <button className="button secondary" onClick={onOpenHealth}>
+        <Activity />
+        Открыть диагностику
+      </button>
+    </section>
+  );
+}
+
 function App() {
   const [accounts, setAccounts] = useState<ManagedAccount[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
@@ -802,6 +904,8 @@ function App() {
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
   const [activeView, setActiveView] = useState<ViewKey>("dashboard");
+  const [commandOpen, setCommandOpen] = useState(false);
+  const [commandSearch, setCommandSearch] = useState("");
   const [loginWizard, setLoginWizard] = useState<LoginWizardState>({ open: false, phase: "method", type: null, result: null, error: null });
   const [confirmState, setConfirmState] = useState<ConfirmState | null>(null);
   const transferResolveRef = useRef<((value: string | null) => void) | null>(null);
@@ -820,6 +924,11 @@ function App() {
   const bestAccount = useMemo(() => {
     return smartRecommendation ? accounts.find((account) => account.id === smartRecommendation.accountId) ?? null : null;
   }, [accounts, smartRecommendation]);
+  const commandPalette = useMemo(() => buildCommandPalette({
+    accounts,
+    activeView,
+    smartRecommendation
+  }), [accounts, activeView, smartRecommendation]);
 
   const selectedAccount = useMemo(() => {
     return accounts.find((account) => account.id === selectedAccountId) ?? stats.active ?? bestAccount ?? accounts[0] ?? null;
@@ -869,6 +978,25 @@ function App() {
       cancelled = true;
     };
   }, [selectedAccount?.id]);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const isTextInput = target?.tagName === "INPUT" || target?.tagName === "TEXTAREA";
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setCommandOpen(true);
+        setCommandSearch("");
+        return;
+      }
+      if (event.key === "Escape" && commandOpen && !isTextInput) {
+        setCommandOpen(false);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [commandOpen]);
+
   async function reload() {
     try {
       const [nextAccounts, nextDiagnostics, nextHealth, nextIntegrity, nextRelease, nextSettings, nextBinding, nextSwitchHistory] = await Promise.all([
@@ -1338,6 +1466,47 @@ function App() {
     setShowReleaseNotes(false);
   }
 
+  function runCommand(command: CommandPaletteCommand): void {
+    if (command.disabled) return;
+    setCommandOpen(false);
+    setCommandSearch("");
+    if (command.view) {
+      setActiveView(command.view);
+      return;
+    }
+    if (command.action === "login") {
+      openLoginWizard();
+      return;
+    }
+    if (command.action === "refreshAll") {
+      void refreshAllAccounts();
+      return;
+    }
+    if (command.action === "switchBest" && command.accountId) {
+      void switchAccount(command.accountId);
+      return;
+    }
+    if (command.action === "switchAccount" && command.accountId) {
+      void switchAccount(command.accountId);
+      return;
+    }
+    if (command.action === "importAuth") {
+      void importAuthJson();
+      return;
+    }
+    if (command.action === "exportVault") {
+      void exportAccounts();
+      return;
+    }
+    if (command.action === "openLogs") {
+      void openLogViewer();
+      return;
+    }
+    if (command.action === "exportDiagnostics") {
+      void exportDiagnosticReport();
+    }
+  }
+
   const pageContent = (() => {
     switch (activeView) {
       case "dashboard":
@@ -1377,7 +1546,10 @@ function App() {
                 ) : null}
               </div>
             </section>
-            <DashboardPage accounts={accounts} />
+            <section className="dashboard-core">
+              <DashboardPage accounts={accounts} />
+              <OperationsTimeline history={switchHistory} onOpenHealth={() => setActiveView("health")} />
+            </section>
             <section className="ops-strip">
               <div className="workspace-card">
                 <div className="workspace-meta">
@@ -1849,6 +2021,14 @@ function App() {
           ))}
         </nav>
         <div className="actions top-actions">
+          <button className="button secondary command-trigger" onClick={() => {
+            setCommandOpen(true);
+            setCommandSearch("");
+          }}>
+            <Command />
+            Команды
+            <kbd>Ctrl K</kbd>
+          </button>
           <button className="button secondary" disabled={busy !== null} onClick={() => startLogin("chatgptDeviceCode")}>
             <KeyRound />
             Код устройства
@@ -1880,6 +2060,15 @@ function App() {
         onClose={closeLoginWizard}
       />
       <ConfirmDialog state={confirmState} onClose={closeConfirm} />
+      <CommandPalette
+        open={commandOpen}
+        query={commandSearch}
+        commands={commandPalette}
+        busy={busy}
+        onQuery={setCommandSearch}
+        onClose={() => setCommandOpen(false)}
+        onRun={runCommand}
+      />
       {transferMode ? (
         <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label={transferMode === "export" ? "Экспорт аккаунтов" : "Импорт аккаунтов"}>
           <div className="transfer-modal">

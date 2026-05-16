@@ -1,7 +1,7 @@
 {
   "name": "codex-account-manager",
   "productName": "Codex Account Manager",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "Local Windows account switcher and rate-limit dashboard for Codex ChatGPT auth profiles.",
   "author": "Egoist Gorbachev",
   "license": "MIT",
@@ -14,6 +14,7 @@
   "private": true,
   "scripts": {
     "dev": "concurrently -k \"vite --host 127.0.0.1\" \"tsc -p tsconfig.main.json --watch --preserveWatchOutput\" \"wait-on http://127.0.0.1:5173 dist/main/main.js && cross-env NODE_ENV=development electron .\"",
+    "repair:native": "npm rebuild better-sqlite3",
     "rebuild:native": "electron-rebuild -f -w better-sqlite3",
     "build": "tsc --noEmit && tsc -p tsconfig.main.json && vite build && npm run rebuild:native && electron-builder --win nsis portable",
     "build:dir": "tsc --noEmit && tsc -p tsconfig.main.json && vite build && npm run rebuild:native && electron-builder --dir",
@@ -22,7 +23,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit",
     "test": "vitest",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "test:node": "npm run repair:native && vitest run"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.6.0",
@@ -91,6 +93,7 @@
       "verifyUpdateCodeSignature": false
     },
     "nsis": {
+      "artifactName": "Codex-Account-Manager-Setup-${version}.${ext}",
       "oneClick": false,
       "perMachine": false,
       "allowToChangeInstallationDirectory": true,
@@ -98,6 +101,9 @@
       "installerIcon": "assets/icon.ico",
       "uninstallerIcon": "assets/icon.ico",
       "deleteAppDataOnUninstall": false
+    },
+    "portable": {
+      "artifactName": "Codex-Account-Manager-${version}.${ext}"
     }
   }
 }
