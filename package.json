@@ -1,0 +1,103 @@
+{
+  "name": "codex-account-manager",
+  "productName": "Codex Account Manager",
+  "version": "1.8.0",
+  "description": "Local Windows account switcher and rate-limit dashboard for Codex ChatGPT auth profiles.",
+  "author": "Egoist Gorbachev",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/egoistgorbachev/codex-account-manager.git"
+  },
+  "type": "module",
+  "main": "dist/main/main.js",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -k \"vite --host 127.0.0.1\" \"tsc -p tsconfig.main.json --watch --preserveWatchOutput\" \"wait-on http://127.0.0.1:5173 dist/main/main.js && cross-env NODE_ENV=development electron .\"",
+    "rebuild:native": "electron-rebuild -f -w better-sqlite3",
+    "build": "tsc --noEmit && tsc -p tsconfig.main.json && vite build && npm run rebuild:native && electron-builder --win nsis portable",
+    "build:dir": "tsc --noEmit && tsc -p tsconfig.main.json && vite build && npm run rebuild:native && electron-builder --dir",
+    "preview": "vite preview --host 127.0.0.1",
+    "smoke": "playwright test",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit",
+    "test": "vitest",
+    "test:run": "vitest run"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^4.6.0",
+    "better-sqlite3": "^12.4.6",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "electron-is-dev": "^3.0.1",
+    "electron-updater": "^6.8.3",
+    "lucide-react": "^0.561.0",
+    "nanoid": "^5.1.6",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^4.0.4",
+    "@playwright/test": "^1.57.0",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "^39.2.7",
+    "electron-builder": "^26.0.12",
+    "png-to-ico": "^3.0.1",
+    "typescript": "^5.9.3",
+    "vite": "^7.0.4",
+    "vitest": "^3.2.4",
+    "wait-on": "^9.0.3"
+  },
+  "build": {
+    "appId": "one.egoist.codex-account-manager",
+    "productName": "Codex Account Manager",
+    "asar": true,
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "egoistgorbachev",
+        "repo": "codex-account-manager",
+        "releaseType": "release"
+      }
+    ],
+    "files": [
+      "dist/**/*",
+      "assets/icon.ico",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "assets/icon.png",
+        "to": "icon.png"
+      }
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "requestedExecutionLevel": "asInvoker",
+      "signAndEditExecutable": false,
+      "verifyUpdateCodeSignature": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "Codex Account Manager",
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "deleteAppDataOnUninstall": false
+    }
+  }
+}
