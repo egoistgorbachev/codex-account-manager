@@ -1,7 +1,7 @@
 {
   "name": "codex-account-manager",
   "productName": "Codex Account Manager",
-  "version": "1.9.1",
+  "version": "1.9.2",
   "description": "Local Windows account switcher and rate-limit dashboard for Codex ChatGPT auth profiles.",
   "author": "Egoist Gorbachev",
   "license": "MIT",

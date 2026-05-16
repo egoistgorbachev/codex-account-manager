@@ -1,4 +1,4 @@
-export const appVersion = "1.9.1";
+export const appVersion = "1.9.2";
 
 export interface ReleaseNoteEntry {
   title: string;
@@ -6,6 +6,10 @@ export interface ReleaseNoteEntry {
 }
 
 export const releaseNotes: ReleaseNoteEntry[] = [
+  {
+    title: "Крупная иконка Windows",
+    body: "Значок приложения пересобран почти без прозрачных полей, чтобы в меню Пуск, на панели задач, в ярлыках, установщике и portable-сборке робот занимал максимум доступного квадрата."
+  },
   {
     title: "Новая иконка",
     body: "Робот переработан в аккуратный круглый PNG-значок без квадратной подложки, с прозрачными краями и более живым свечением."
@@ -24,6 +28,6 @@ export const releaseNotes: ReleaseNoteEntry[] = [
   },
   {
     title: "Патч-релиз",
-    body: "Версия 1.9.1 доставляет визуальное обновление через обычный GitHub Release feed и `latest.yml`."
+    body: "Версия 1.9.2 доставляет увеличенную Windows-иконку через обычный GitHub Release feed и `latest.yml`."
   }
 ];
