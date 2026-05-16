@@ -20,7 +20,7 @@ export function SettingsPage({
   onUpdate: (input: Partial<Omit<AppSettings, "language">>) => void;
 }) {
   return (
-    <section className="page-panel" aria-label={uiText.nav.settings}>
+    <section className="page-panel settings-panel" aria-label={uiText.nav.settings}>
       <div className="page-header">
         <span>{uiText.nav.settings}</span>
         <h2>{uiText.settings.title}</h2>

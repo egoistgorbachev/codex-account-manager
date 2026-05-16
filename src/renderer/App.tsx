@@ -855,7 +855,7 @@ function OperationsTimeline({
         <h2>Последние действия</h2>
       </div>
       <div className="timeline-list">
-        {history.length ? history.slice(0, 4).map((event) => (
+        {history.length ? history.slice(0, 8).map((event) => (
           <article key={event.id} className={`timeline-item ${event.status}`}>
             <div>
               <strong>{event.accountLabel ?? event.accountEmail ?? event.accountId}</strong>
@@ -1975,7 +1975,7 @@ function App() {
                 <h2>Последние переключения</h2>
               </div>
               <div className="history-list">
-                {switchHistory.length ? switchHistory.slice(0, 6).map((event) => (
+                {switchHistory.length ? switchHistory.slice(0, 12).map((event) => (
                   <article key={event.id} className={`history-item ${event.status}`}>
                     <span>{formatTime(event.startedAt)}</span>
                     <strong>{event.accountLabel ?? event.accountId}</strong>
@@ -2051,7 +2051,7 @@ function App() {
         </div>
       </header>
 
-      <div className="content">{pageContent}</div>
+      <div className={`content content-${activeView}`}>{pageContent}</div>
       <AddAccountWizard
         state={loginWizard}
         busy={busy}

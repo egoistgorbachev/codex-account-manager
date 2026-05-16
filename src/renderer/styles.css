@@ -155,9 +155,9 @@ input:focus-visible {
   width: 36px;
   height: 36px;
   place-items: center;
-  border: 1px solid var(--glass-10);
-  border-radius: var(--radius-card);
-  background: rgba(255, 255, 255, 0.04);
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
   overflow: hidden;
 }
 
@@ -174,8 +174,8 @@ input:focus-visible {
 .mark img {
   position: relative;
   z-index: 1;
-  width: 27px;
-  height: 27px;
+  width: 34px;
+  height: 34px;
   object-fit: contain;
 }
 
@@ -405,14 +405,79 @@ h1 {
   display: grid;
   gap: 10px;
   width: min(1520px, calc(100% - 48px));
+  height: 100%;
   margin: 0 auto;
   padding: 10px 0 14px;
   min-height: 0;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 193, 255, 0.28) transparent;
 }
 
 .content > * {
   min-height: 0;
+}
+
+.content::-webkit-scrollbar,
+.profile-main.is-scrollable::-webkit-scrollbar,
+.inspector::-webkit-scrollbar,
+.limits-list::-webkit-scrollbar,
+.vault-grid::-webkit-scrollbar,
+.history-list::-webkit-scrollbar,
+.timeline-list::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.content::-webkit-scrollbar-track,
+.profile-main.is-scrollable::-webkit-scrollbar-track,
+.inspector::-webkit-scrollbar-track,
+.limits-list::-webkit-scrollbar-track,
+.vault-grid::-webkit-scrollbar-track,
+.history-list::-webkit-scrollbar-track,
+.timeline-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.content::-webkit-scrollbar-thumb,
+.profile-main.is-scrollable::-webkit-scrollbar-thumb,
+.inspector::-webkit-scrollbar-thumb,
+.limits-list::-webkit-scrollbar-thumb,
+.vault-grid::-webkit-scrollbar-thumb,
+.history-list::-webkit-scrollbar-thumb,
+.timeline-list::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(201, 193, 255, 0.24);
+}
+
+.content-dashboard,
+.content-accounts,
+.content-limits,
+.content-vault,
+.content-settings {
+  overflow: hidden;
+}
+
+.content-dashboard {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.content-accounts {
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.content-limits,
+.content-vault {
+  align-content: start;
+  overflow-y: auto;
+  grid-template-rows: auto;
+}
+
+.content-settings {
+  align-content: start;
+  overflow-y: auto;
+  grid-template-rows: auto auto auto;
 }
 
 .hero {
@@ -823,15 +888,24 @@ h1 {
 .vault-panel {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
-  height: calc(100vh - 92px);
+  height: 100%;
   min-height: 0;
+}
+
+.account-panel {
+  height: calc(100% - 2px);
+}
+
+.limits-panel,
+.vault-panel {
+  height: auto;
 }
 
 .panel-head {
   display: grid;
   grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.2fr);
   gap: 10px;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border-bottom: 1px solid var(--glass-10);
 }
 
@@ -994,8 +1068,8 @@ h1 {
 }
 
 .avatar.large {
-  width: 58px;
-  height: 58px;
+  width: 50px;
+  height: 50px;
   font-size: 16px;
 }
 
@@ -1138,9 +1212,12 @@ h1 {
 }
 
 .limits-grid {
-  grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.28fr);
-  align-items: stretch;
-  padding: 16px;
+  grid-template-columns: minmax(300px, 0.58fr) minmax(0, 1.42fr);
+  align-items: start;
+  align-content: start;
+  gap: 10px;
+  padding: 10px;
+  overflow: hidden;
 }
 
 .limits-overview,
@@ -1154,38 +1231,96 @@ h1 {
 
 .limits-overview {
   display: grid;
-  place-items: center;
-  gap: 16px;
-  padding: 18px;
+  grid-template-columns: 104px minmax(0, 1fr);
+  align-content: start;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+}
+
+.limits-overview .signal-orbit {
+  width: 96px;
+  height: 96px;
+}
+
+.limits-overview .orbit-core {
+  width: 54px;
+  height: 54px;
+}
+
+.limits-overview .orbit-core svg {
+  width: 19px;
+  height: 19px;
+}
+
+.limits-overview .orbit-core strong {
+  font-size: 15px;
+}
+
+.limits-overview .recommendation {
+  width: 100%;
+  min-width: 0;
+  padding: 9px;
 }
 
 .limits-list {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  padding: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  align-content: start;
+  gap: 8px;
+  padding: 10px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 193, 255, 0.28) transparent;
 }
 
 .limit-card {
   display: grid;
-  gap: 12px;
+  gap: 8px;
   min-width: 0;
-  padding: 14px;
+  padding: 10px;
   border: 1px solid var(--glass-10);
   border-radius: var(--radius-overlay);
   background: rgba(255, 255, 255, 0.03);
 }
 
 .vault-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  padding: 16px;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: 8px;
+  padding: 10px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 193, 255, 0.28) transparent;
+}
+
+.vault-panel .command-card {
+  grid-template-columns: 28px 112px minmax(0, 1fr);
+  align-items: center;
+  min-height: 46px;
+  gap: 10px;
+  padding: 9px 10px;
+}
+
+.vault-panel .command-card svg {
+  width: 18px;
+  height: 18px;
+}
+
+.vault-panel .command-card span,
+.vault-panel .command-card strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .vault-note {
   display: grid;
-  align-content: center;
+  grid-template-columns: 112px minmax(0, 0.9fr) minmax(0, 1.6fr);
+  align-items: center;
   gap: 10px;
-  padding: 16px;
+  padding: 9px 10px;
 }
 
 .vault-note span {
@@ -1197,8 +1332,8 @@ h1 {
 .vault-note p {
   margin: 0;
   color: var(--muted);
-  font-size: 13px;
-  line-height: 1.45;
+  font-size: 12px;
+  line-height: 1.35;
 }
 
 .settings-strip,
@@ -1249,12 +1384,16 @@ h1 {
 .inspector {
   display: grid;
   align-content: start;
-  gap: 10px;
-  min-height: 100%;
-  padding: 12px;
+  gap: 8px;
+  height: 100%;
+  min-height: 0;
+  padding: 10px;
+  overflow-y: auto;
   border-width: 0 0 0 1px;
   border-radius: 0;
   background: rgba(255, 255, 255, 0.025);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 193, 255, 0.28) transparent;
 }
 
 .empty-inspector {
@@ -1300,8 +1439,8 @@ h1 {
 
 .inspector-grid > div {
   display: grid;
-  gap: 6px;
-  padding: 12px;
+  gap: 4px;
+  padding: 8px;
   border: 1px solid var(--glass-10);
   border-radius: var(--radius-overlay);
   background: rgba(255, 255, 255, 0.03);
@@ -1372,8 +1511,9 @@ h1 {
 .limit-history {
   display: grid;
   gap: 10px;
-  width: min(280px, 100%);
-  padding: 10px;
+  grid-column: 1 / -1;
+  width: 100%;
+  padding: 8px;
   border: 1px solid var(--glass-10);
   border-radius: var(--radius-card);
   background: rgba(255, 255, 255, 0.035);
@@ -1394,7 +1534,7 @@ h1 {
   grid-template-columns: repeat(12, minmax(6px, 1fr));
   align-items: end;
   gap: 5px;
-  height: 64px;
+  height: 46px;
 }
 
 .history-bars span,
@@ -1418,7 +1558,7 @@ h1 {
   align-items: center;
   gap: 9px;
   min-width: 0;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border: 1px solid var(--glass-10);
   border-radius: var(--radius-overlay);
   color: var(--ash);
@@ -1438,6 +1578,9 @@ h1 {
 
 .inspector-actions .button {
   width: 100%;
+  min-height: 30px;
+  padding: 0 10px;
+  font-size: 12px;
 }
 
 .empty {
@@ -1663,8 +1806,8 @@ h1 {
 
 .page-panel {
   display: grid;
-  gap: 10px;
-  padding: 12px;
+  gap: 8px;
+  padding: 10px;
 }
 
 .page-header {
@@ -1704,7 +1847,7 @@ h1 {
 .compact-list,
 .settings-list {
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .health-grid {
@@ -1801,8 +1944,37 @@ h1 {
 }
 
 .settings-list label {
-  grid-template-columns: minmax(180px, 0.3fr) minmax(0, 1fr);
+  grid-template-columns: minmax(150px, 0.34fr) minmax(0, 1fr);
   align-items: center;
+}
+
+.settings-panel {
+  align-content: start;
+}
+
+.content-settings .settings-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.content-settings .settings-list label {
+  min-height: 44px;
+  padding: 8px 10px;
+}
+
+.content-settings .settings-list span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-toggle {
+  justify-self: start;
+  min-width: 128px;
+}
+
+.settings-strip {
+  grid-template-columns: minmax(0, 1.06fr) minmax(360px, 0.94fr);
+  gap: 8px;
 }
 
 .workspace-bind-strip {
@@ -1843,7 +2015,7 @@ h1 {
 }
 
 .switch-history-panel {
-  max-height: 240px;
+  max-height: 220px;
   overflow: hidden;
 }
 
@@ -1851,14 +2023,17 @@ h1 {
   display: grid;
   gap: 6px;
   min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 193, 255, 0.28) transparent;
 }
 
 .history-item {
   display: grid;
-  grid-template-columns: 132px minmax(0, 1fr) 90px 32px;
+  grid-template-columns: 120px minmax(0, 1fr) 78px 28px;
   align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
+  gap: 8px;
+  padding: 7px 8px;
   border: 1px solid var(--glass-10);
   border-radius: var(--radius-overlay);
   background: rgba(255, 255, 255, 0.025);
@@ -2163,6 +2338,11 @@ kbd {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   min-width: 0;
+  min-height: 0;
+  max-height: 160px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 193, 255, 0.28) transparent;
 }
 
 .timeline-item {
@@ -2171,7 +2351,7 @@ kbd {
   justify-content: space-between;
   gap: 10px;
   min-width: 0;
-  padding: 9px 10px;
+  padding: 8px 9px;
   border: 1px solid var(--glass-10);
   border-radius: var(--radius-overlay);
   background: rgba(255, 255, 255, 0.035);
@@ -2316,8 +2496,17 @@ kbd {
   .ops-strip,
   .dashboard-core,
   .ops-timeline,
+  .settings-strip,
   .panel-head,
   .profile-workbench {
+    grid-template-columns: 1fr;
+  }
+
+  .content-settings .settings-list {
+    grid-template-columns: 1fr;
+  }
+
+  .vault-note {
     grid-template-columns: 1fr;
   }
 
