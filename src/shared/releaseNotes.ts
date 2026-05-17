@@ -1,4 +1,4 @@
-export const appVersion = "1.9.2";
+export const appVersion = "1.9.3";
 
 export interface ReleaseNoteEntry {
   title: string;
@@ -6,6 +6,10 @@ export interface ReleaseNoteEntry {
 }
 
 export const releaseNotes: ReleaseNoteEntry[] = [
+  {
+    title: "Ярлык панели задач",
+    body: "Приложение теперь само обновляет локальный Windows `icon.ico` и перепривязывает ярлыки меню Пуск и панели задач к версионной иконке, чтобы закрепление не оставалось на старом кэше."
+  },
   {
     title: "Крупная иконка Windows",
     body: "Значок приложения пересобран почти без прозрачных полей, чтобы в меню Пуск, на панели задач, в ярлыках, установщике и portable-сборке робот занимал максимум доступного квадрата."
@@ -28,6 +32,6 @@ export const releaseNotes: ReleaseNoteEntry[] = [
   },
   {
     title: "Патч-релиз",
-    body: "Версия 1.9.2 доставляет увеличенную Windows-иконку через обычный GitHub Release feed и `latest.yml`."
+    body: "Версия 1.9.3 доставляет исправление ярлыков Windows через обычный GitHub Release feed и `latest.yml`."
   }
 ];

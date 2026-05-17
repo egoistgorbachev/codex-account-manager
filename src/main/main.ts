@@ -18,6 +18,7 @@ import { appVersion } from "../shared/releaseNotes.js";
 import { ReleaseService } from "./services/releaseService.js";
 import { getCrashReportsDir, writeCrashReport } from "./services/crashReportService.js";
 import { UpdaterService } from "./services/updaterService.js";
+import { syncWindowsShortcutIcon } from "./services/windowsShortcutIconService.js";
 
 let mainWindow: BrowserWindow | null = null;
 let manager: AccountManager | null = null;
@@ -35,6 +36,10 @@ let currentRateLimitRefreshIntervalMs: AppSettings["autoRefreshIntervalMs"] = 18
 
 function getWindowIconPath(): string {
   return app.isPackaged ? path.join(process.resourcesPath, "icon.png") : path.join(process.cwd(), "assets", "icon.png");
+}
+
+function getWindowsShortcutIconSourcePath(): string {
+  return app.isPackaged ? path.join(app.getAppPath(), "assets", "icon.ico") : path.join(process.cwd(), "assets", "icon.ico");
 }
 
 function log(message: string, error?: unknown): void {
@@ -531,6 +536,14 @@ if (!gotLock) {
   app.whenReady().then(() => {
     const appDataDir = getAppDataDir();
     logPath = path.join(appDataDir, "logs", "main.log");
+    syncWindowsShortcutIcon({
+      env: process.env,
+      platform: process.platform,
+      productName: "Codex Account Manager",
+      sourceIcoPath: getWindowsShortcutIconSourcePath(),
+      version: appVersion,
+      log
+    });
     updaterService = new UpdaterService(() => mainWindow, log);
     registerIpc(appDataDir);
 
